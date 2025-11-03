@@ -1,0 +1,337 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: cd src && python data_ingestion_pipeline.py
+    deps:
+    - path: config/params.yaml
+      hash: md5
+      md5: 9ae7f6669257f10fd3514dafd1a0d9a6
+      size: 2639
+    - path: data/raw/amazon.csv
+      hash: md5
+      md5: ee866c4757bb72b417533a2a742a8fb2
+      size: 4744481
+    - path: src/data_ingestion/load_csv.py
+      hash: md5
+      md5: a29e84c42c6fc2005c1c9219b1e39007
+      size: 1485
+    - path: src/data_ingestion/preprocess_data.py
+      hash: md5
+      md5: 1f5089588ba472e163041f9109864fe0
+      size: 9035
+    - path: src/data_ingestion/validate_data.py
+      hash: md5
+      md5: ced3b7535dcb0938e26cd099d64d12b6
+      size: 1564
+    - path: src/data_ingestion_pipeline.py
+      hash: md5
+      md5: a9c7df05a342369ec956f022421c0619
+      size: 5191
+    params:
+      config/params.yaml:
+        artifacts.preprocessor_path: ../artifacts/preprocessor.joblib
+        data.cols_raw:
+        - product_id
+        - product_name
+        - category
+        - actual_price
+        - rating
+        - rating_count
+        - about_product
+        - user_id
+        - user_name
+        - review_id
+        - review_title
+        - review_content
+        - img_link
+        - product_link
+        data.cols_transformed:
+        - rating
+        - product_name
+        - review_word_count
+        - review_length
+        - rating_count
+        - actual_price
+        - user_id_freq
+        - review_title_length
+        - category
+        - rating_x_count
+        - product_id_freq
+        - about_product_length
+        data.path: ../data/raw/amazon.csv
+        data.path_selected: ../data/processed/selected.csv
+        data.random_state: 42
+        data.target: discount_percentage
+        data.test_size: 0.2
+        logs.data_ingestion_file: data_ingestion.log
+    outs:
+    - path: artifacts/data_quality_metrics.json
+      hash: md5
+      md5: b6dbecb81771769d812dc162ef38ce4d
+      size: 1293
+    - path: artifacts/preprocessor.joblib
+      hash: md5
+      md5: 43fc6193183038a7b08df1fdebd8705d
+      size: 494569
+    - path: data/processed/X_test.csv
+      hash: md5
+      md5: 52df5a54b08b962425e1ba8d128c511e
+      size: 986005
+    - path: data/processed/X_train.csv
+      hash: md5
+      md5: 0e598f4b46454cc1078a6215c8e2122f
+      size: 249672
+    - path: data/processed/selected.csv
+      hash: md5
+      md5: cbfef656d2ad5633cf5e30f4a9663a3c
+      size: 4731540
+    - path: data/processed/y_test.csv
+      hash: md5
+      md5: a8be635969afd0838fa466fe6ce88c6e
+      size: 1184
+    - path: data/processed/y_train.csv
+      hash: md5
+      md5: 023da3ac20767b9750a27da90763b3b1
+      size: 5632
+  model_training:
+    cmd: cd src && python model_training_pipeline.py
+    deps:
+    - path: artifacts/preprocessor.joblib
+      hash: md5
+      md5: 43fc6193183038a7b08df1fdebd8705d
+      size: 494569
+    - path: config/params.yaml
+      hash: md5
+      md5: 9ae7f6669257f10fd3514dafd1a0d9a6
+      size: 2639
+    - path: data/processed/X_test.csv
+      hash: md5
+      md5: 52df5a54b08b962425e1ba8d128c511e
+      size: 986005
+    - path: data/processed/X_train.csv
+      hash: md5
+      md5: 0e598f4b46454cc1078a6215c8e2122f
+      size: 249672
+    - path: data/processed/y_test.csv
+      hash: md5
+      md5: a8be635969afd0838fa466fe6ce88c6e
+      size: 1184
+    - path: data/processed/y_train.csv
+      hash: md5
+      md5: 023da3ac20767b9750a27da90763b3b1
+      size: 5632
+    - path: src/model_trainers/model_factory.py
+      hash: md5
+      md5: f15ae393b0bf7da8ed3ba264d6e108d3
+      size: 889
+    - path: src/model_trainers/trainer.py
+      hash: md5
+      md5: 18b012d64a5b7ac00fe91a2ee1323292
+      size: 15829
+    - path: src/model_training_pipeline.py
+      hash: md5
+      md5: e327eed13bc8fc5b4f5b12ed1af52e40
+      size: 4093
+    params:
+      config/params.yaml:
+        logs.model_training_file: model_training.log
+        training.cv: 3
+        training.experiments_csv: ../artifacts/experiments.csv
+        training.models:
+          linear_regression:
+            estimator: linear_regression
+            param_grid: {}
+          random_forest:
+            estimator: random_forest
+            param_grid:
+              n_estimators:
+              - 50
+              - 100
+              - 200
+              max_depth:
+              - 3
+              - 5
+              - 10
+              - 
+              min_samples_split:
+              - 2
+              - 5
+              - 10
+              random_state:
+              - 42
+          gradient_boosting:
+            estimator: gradient_boosting
+            param_grid:
+              n_estimators:
+              - 50
+              - 100
+              - 200
+              learning_rate:
+              - 0.01
+              - 0.1
+              max_depth:
+              - 3
+              - 5
+              - 7
+              random_state:
+              - 42
+          ridge:
+            estimator: ridge_regression
+            param_grid:
+              alpha:
+              - 0.1
+              - 1.0
+              - 10.0
+              - 100.0
+              random_state:
+              - 42
+        training.n_iter_search: 20
+        training.random_state: 42
+        training.scoring: neg_root_mean_squared_error
+        training.val_size: 0.2
+    outs:
+    - path: artifacts/experiments.csv
+      hash: md5
+      md5: 08132c87cd7db91d18394eb9b1e4c31b
+      size: 800
+    - path: artifacts/model.joblib
+      hash: md5
+      md5: 23d3c00b8159206fd3df138cb024a8cc
+      size: 742312
+  model_evaluation:
+    cmd: cd src && python model_evaluation_pipeline.py
+    deps:
+    - path: artifacts/model.joblib
+      hash: md5
+      md5: 23d3c00b8159206fd3df138cb024a8cc
+      size: 742312
+    - path: config/params.yaml
+      hash: md5
+      md5: 9ae7f6669257f10fd3514dafd1a0d9a6
+      size: 2639
+    - path: data/processed/X_test.csv
+      hash: md5
+      md5: 52df5a54b08b962425e1ba8d128c511e
+      size: 986005
+    - path: data/processed/y_test.csv
+      hash: md5
+      md5: a8be635969afd0838fa466fe6ce88c6e
+      size: 1184
+    - path: src/model_evaluation_pipeline.py
+      hash: md5
+      md5: e79df442a7b5d7f82f43ca9bf4ec0206
+      size: 3142
+    params:
+      config/params.yaml:
+        logs.model_evaluation_file: model_evaluation.log
+    outs:
+    - path: artifacts/eval_metrics.json
+      hash: md5
+      md5: 2fb31ca963c27509c242b2ca37d82b1e
+      size: 106
+  model_inference:
+    cmd: cd src && python model_inference_pipeline.py
+    deps:
+    - path: artifacts/model.joblib
+      hash: md5
+      md5: 23d3c00b8159206fd3df138cb024a8cc
+      size: 742312
+    - path: config/params.yaml
+      hash: md5
+      md5: 9ae7f6669257f10fd3514dafd1a0d9a6
+      size: 2639
+    - path: data/processed/X_test.csv
+      hash: md5
+      md5: 52df5a54b08b962425e1ba8d128c511e
+      size: 986005
+    - path: data/processed/y_test.csv
+      hash: md5
+      md5: a8be635969afd0838fa466fe6ce88c6e
+      size: 1184
+    - path: src/model_inference_pipeline.py
+      hash: md5
+      md5: e5cb1d3aa3413812e033512a7877debf
+      size: 2761
+    params:
+      config/params.yaml:
+        logs.model_inference_file: model_inference.log
+    outs:
+    - path: artifacts/predictions.csv
+      hash: md5
+      md5: ab591804f59a2f43a50519af25b7d74b
+      size: 7059
+  rag_data_ingestion:
+    cmd: cd src && python rag_data_ingestion_pipeline.py
+    deps:
+    - path: config/params.yaml
+      hash: md5
+      md5: e4c53a049cb638c8350875fc4a704ccd
+      size: 2695
+    - path: data/raw/amazon.csv
+      hash: md5
+      md5: ee866c4757bb72b417533a2a742a8fb2
+      size: 4744481
+    - path: src/data_ingestion/rag_data_ingestion.py
+      hash: md5
+      md5: 9f40332c4df32f92b9155224873f677d
+      size: 3157
+    - path: src/rag_data_ingestion_pipeline.py
+      hash: md5
+      md5: 45fb6ed598e481b51147c92ce721b99b
+      size: 2043
+    params:
+      config/params.yaml:
+        logs.rag_data_ingestion_file: rag_data_ingestion.log
+        rag.collection_name: amazon_reviews_collection
+        rag.data_path: ../data/raw/amazon.csv
+        rag.embedding_model_name: sentence-transformers/all-MiniLM-L6-v2
+        rag.max_rows: 1000
+        rag.persist_directory: ../chroma_db
+    outs:
+    - path: chroma_db
+      hash: md5
+      md5: 3baf492a52885e92bd030299a795e883.dir
+      size: 29023352
+      nfiles: 6
+  rag_pipeline:
+    cmd: cd src && python rag_pipeline.py
+    deps:
+    - path: .env
+      hash: md5
+      md5: 86376a44e42ff0d9399f797521ae9cb9
+      size: 72
+    - path: config/params.yaml
+      hash: md5
+      md5: 9ae7f6669257f10fd3514dafd1a0d9a6
+      size: 2639
+    - path: data/raw/amazon.csv
+      hash: md5
+      md5: ee866c4757bb72b417533a2a742a8fb2
+      size: 4744481
+    - path: src/data_ingestion/rag_data_ingestion.py
+      hash: md5
+      md5: 9b82d18c67191a477b72db0225f74f8b
+      size: 3626
+    - path: src/rag_chains/qa_chain.py
+      hash: md5
+      md5: d0e4ff221cb21a086cc718beb64522a9
+      size: 1199
+    - path: src/rag_pipeline.py
+      hash: md5
+      md5: 0b4577e960fb2110cfda856910d03a65
+      size: 3925
+    params:
+      config/params.yaml:
+        logs.rag_pipeline_file: rag_pipeline.log
+        rag.collection_name: amazon_reviews_collection
+        rag.data_path: ../data/raw/amazon.csv
+        rag.embedding_model_name: sentence-transformers/all-MiniLM-L6-v2
+        rag.force_ingestion: true
+        rag.max_rows: 1500
+        rag.persist_directory: ../chroma_db
+    outs:
+    - path: chroma_db
+      hash: md5
+      md5: 72040b05024ba71855e9e2399eadb117.dir
+      size: 39989308
+      nfiles: 6

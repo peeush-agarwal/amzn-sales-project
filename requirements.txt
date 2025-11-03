@@ -1,0 +1,31 @@
+# Python=3.12
+
+# --- Core ML and Data handling ---
+pandas
+numpy
+scikit-learn
+joblib
+pyyaml
+
+# --- Experiment Tracking ---
+mlflow
+
+# --- Serving / API ---
+fastapi
+uvicorn
+python-dotenv
+
+# --- Workflow and Orchestration ---
+dvc
+
+# --- Testing and Quality ---
+pytest
+pre-commit
+
+# RAG dependencies
+chromadb
+langchain-classic
+langchain-community
+langchain-huggingface
+langchain-groq
+sentence-transformers

@@ -1,0 +1,108 @@
+logs:
+  level: INFO
+  path: ../logs
+  data_ingestion_file: data_ingestion.log
+  model_training_file: model_training.log
+  model_evaluation_file: model_evaluation.log
+  model_inference_file: model_inference.log
+  rag_pipeline_file: rag_pipeline.log
+
+data:
+  path: ../data/raw/amazon.csv
+  path_selected: ../data/processed/selected.csv
+  path_train_features: ../data/processed/X_train.csv
+  path_train_target: ../data/processed/y_train.csv
+  path_test_features: ../data/processed/X_test.csv
+  path_test_target: ../data/processed/y_test.csv
+  cols_raw: 
+    - product_id
+    - product_name
+    - category
+    - actual_price
+    - rating
+    - rating_count
+    - about_product
+    - user_id
+    - user_name
+    - review_id
+    - review_title
+    - review_content
+    - img_link
+    - product_link
+  cols_transformed:
+    - rating
+    - product_name
+    - review_word_count
+    - review_length
+    - rating_count
+    - actual_price
+    - user_id_freq
+    - review_title_length
+    - category
+    - rating_x_count
+    - product_id_freq
+    - about_product_length
+  target: discount_percentage
+  test_size: 0.2
+  random_state: 42
+
+model_params:
+  n_estimators: 100
+  max_depth: 5
+  random_state: 42
+
+artifacts:
+  preprocessor_path: ../artifacts/preprocessor.joblib
+  model_path: ../artifacts/model.joblib
+  metrics_path: ../artifacts/metrics.json
+
+training:
+  experiments_csv: ../artifacts/experiments.csv
+  cv: 3
+  n_iter_search: 20
+  models:
+    linear_regression:
+      estimator: linear_regression
+      param_grid: {}
+    random_forest:
+      estimator: random_forest
+      param_grid:
+        n_estimators: [50, 100, 200]
+        max_depth: [3, 5, 10, null]
+        min_samples_split: [2, 5, 10]
+        random_state: [42]
+    gradient_boosting:
+      estimator: gradient_boosting
+      param_grid:
+        n_estimators: [50, 100, 200]
+        learning_rate: [0.01, 0.1]
+        max_depth: [3, 5, 7]
+        random_state: [42]
+    ridge:
+      estimator: ridge_regression
+      param_grid:
+        alpha: [0.1, 1.0, 10.0, 100.0]
+        random_state: [42]
+  scoring: neg_root_mean_squared_error
+  val_size: 0.2
+  random_state: 42
+  n_jobs: -1
+  enable_progress: true
+  register_model: false
+  output_model_path: ../artifacts/model.joblib
+  model_meta_path: ../artifacts/model.meta.json
+
+api:
+  name: Amazon Discount Predictor API
+  version: 1.0.0
+  host: 0.0.0.0
+  port: 8000
+
+rag:
+  collection_name: amazon_reviews_collection
+  persist_directory: ../chroma_db
+  embedding_model_name: sentence-transformers/all-MiniLM-L6-v2
+  data_path: ../data/raw/amazon.csv
+  max_rows: 1500
+  llm_model_name: llama-3.1-8b-instant
+  force_ingestion: true

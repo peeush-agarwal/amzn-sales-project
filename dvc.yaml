@@ -1,0 +1,104 @@
+stages:
+  data_ingestion:
+    cmd: cd src && python data_ingestion_pipeline.py
+    deps:
+      - data/raw/amazon.csv
+      - src/data_ingestion_pipeline.py
+      - src/data_ingestion/load_csv.py
+      - src/data_ingestion/validate_data.py
+      - src/data_ingestion/preprocess_data.py
+      - config/params.yaml
+    params:
+      - config/params.yaml:
+        - logs.data_ingestion_file
+        - data.path
+        - data.path_selected
+        - data.cols_raw
+        - data.cols_transformed
+        - data.target
+        - data.test_size
+        - data.random_state
+        - artifacts.preprocessor_path
+    outs:
+      - data/processed/selected.csv
+      - data/processed/X_train.csv
+      - data/processed/y_train.csv
+      - data/processed/X_test.csv
+      - data/processed/y_test.csv
+      - artifacts/preprocessor.joblib
+    metrics:
+      - artifacts/data_quality_metrics.json:
+          cache: false
+  model_training:
+    cmd: cd src && python model_training_pipeline.py
+    deps:
+      - data/processed/X_train.csv
+      - data/processed/y_train.csv
+      - data/processed/X_test.csv
+      - data/processed/y_test.csv
+      - artifacts/preprocessor.joblib
+      - src/model_trainers/trainer.py
+      - src/model_trainers/model_factory.py
+      - src/model_training_pipeline.py
+      - config/params.yaml
+    params:
+      - config/params.yaml:
+          - logs.model_training_file
+          - training.cv
+          - training.n_iter_search
+          - training.models
+          - training.scoring
+          - training.val_size
+          - training.random_state
+          - training.experiments_csv
+    outs:
+      - artifacts/experiments.csv
+      - artifacts/model.joblib
+  model_evaluation:
+    cmd: cd src && python model_evaluation_pipeline.py
+    deps:
+      - artifacts/model.joblib
+      - data/processed/X_test.csv
+      - data/processed/y_test.csv
+      - src/model_evaluation_pipeline.py
+      - config/params.yaml
+    params:
+      - config/params.yaml:
+        - logs.model_evaluation_file
+    outs:
+      - artifacts/eval_metrics.json:
+          cache: false
+  model_inference:
+    cmd: cd src && python model_inference_pipeline.py
+    deps:
+      - artifacts/model.joblib
+      - data/processed/X_test.csv
+      - data/processed/y_test.csv
+      - src/model_inference_pipeline.py
+      - config/params.yaml
+    params:
+      - config/params.yaml:
+        - logs.model_inference_file
+    outs:
+      - artifacts/predictions.csv
+  rag_pipeline:
+    cmd: cd src && python rag_pipeline.py
+    deps:
+      - src/rag_pipeline.py
+      - src/data_ingestion/rag_data_ingestion.py
+      - src/rag_chains/qa_chain.py
+      - config/params.yaml
+      - data/raw/amazon.csv
+      - .env
+    params:
+      - config/params.yaml:
+        - logs.rag_pipeline_file
+        - rag.collection_name
+        - rag.persist_directory
+        - rag.embedding_model_name
+        - rag.data_path
+        - rag.max_rows
+        - rag.force_ingestion
+    outs:
+      - chroma_db:
+          cache: false

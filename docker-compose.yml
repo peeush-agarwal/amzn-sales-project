@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      # Model/artifacts (read-only) so container can load preprocessor/model files
+      - ./artifacts:/app/artifacts:ro
+      # Config and data (read-only)
+      - ./config:/app/config:ro
+      - ./data:/app/data:ro
+      # Chroma DB persist directory (RAG will read/write here)
+      - ./chroma_db:/app/chroma_db
+      # Logs (persist API logs)
+      - ./logs:/app/logs
+    working_dir: /app/src
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
