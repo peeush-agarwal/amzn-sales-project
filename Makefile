@@ -1,22 +1,11 @@
-PHONY: all setup deploy clean
+PHONY: all deploy clean
 
-all: setup deploy
-
-setup:
-	echo "Setting up the environment..."
-
-	uv venv && source .venv/bin/activate && uv sync
-
-	echo "Setup complete."
+all: deploy
 
 deploy:
-	echo "Running DVC stages..."
-
-	source .venv/bin/activate && python -m dvc repro
-
 	echo "Building Docker image..."
 
-	docker compose up -d --build
+	docker compose build --no-cache && docker compose up -d
 
 	echo "Deployment complete."
 
