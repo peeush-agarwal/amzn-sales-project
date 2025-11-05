@@ -9,16 +9,6 @@ services:
       - .env
     ports:
       - "8000:8000"
-    volumes:
-      # Model/artifacts (read-only) so container can load preprocessor/model files
-      - ./artifacts:/app/artifacts:ro
-      # Config and data (read-only)
-      - ./config:/app/config:ro
-      - ./data:/app/data:ro
-      # Chroma DB persist directory (RAG will read/write here)
-      - ./chroma_db:/app/chroma_db
-      # Logs (persist API logs)
-      - ./logs:/app/logs
     working_dir: /app/src
     restart: unless-stopped
     healthcheck:

@@ -14,7 +14,7 @@ data:
   path_train_target: ../data/processed/y_train.csv
   path_test_features: ../data/processed/X_test.csv
   path_test_target: ../data/processed/y_test.csv
-  cols_raw: 
+  cols_raw:
     - product_id
     - product_name
     - category
