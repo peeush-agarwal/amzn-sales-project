@@ -5,10 +5,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    env_file:
-      - .env
+      args:
+        GROQ_API_KEY: "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"
     ports:
       - "8000:8000"
+    volumes:
+    - ./logs:/app/logs
     working_dir: /app/src
     restart: unless-stopped
     healthcheck:

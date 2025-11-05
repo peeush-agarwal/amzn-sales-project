@@ -14,26 +14,21 @@ This is a production-grade MLOps Pipeline showcasing:
 
 ## 📋 Prerequisites
 
-- Python 3.12+
-- pip or uv package manager
-- We're using 'GROQ API' for LLM Inference, configure "GROQ_API_KEY" inside .env file. Copy and rename __.env.example__ to __.env__ and then update the GROQ_API_KEY. GROQ API is free to use and easy to setup an API Key.
+- Docker and Docker-Compose installed and running.
 
 ## Running the docker container
 
-1. Add raw data file inside `data/raw` folder, named `amazon.csv`
-1. Prepare `.env` and update `GROQ_API_KEY` (Refer to `.env.example`)
-1. Run `make all` to perform following:
-   - ML model data ingestion, cleaning and feature engineering
-   - ML model training, evaluation and store all models
-   - RAG data ingestion and store into vector store
-   - Dockerized container with FastAPI to expose `predict_discount` and `answer_question` endpoints
+1. Run `docker compose build --no-cache && docker compose up -d`
 1. Browse to [localhost:8000](http://localhost:8000/docs) for API documentation.
 
 ### Cleanup
 
-1. Run `make clean`
+1. Run `docker compose down`
 
 > NOTE: The project has been tested on MacOS (Apple Silicon).
+
+## Running into local machine
+
 
 ## 🚀 Quick Start
 

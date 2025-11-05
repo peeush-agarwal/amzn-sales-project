@@ -9,13 +9,13 @@ WORKDIR /app
 # Install system dependencies needed to build some Python packages and for DB backends
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
-	   build-essential \
-	   git \
-	   curl \
-	   libsqlite3-dev \
-	   libpq-dev \
-	   libffi-dev \
-	   ca-certificates \
+	build-essential \
+	git \
+	curl \
+	libsqlite3-dev \
+	libpq-dev \
+	libffi-dev \
+	ca-certificates \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Copy only dependency files first to leverage Docker cache
@@ -39,6 +39,10 @@ USER appuser
 # The application package root is under /app/src so make that the working dir
 WORKDIR /app/src
 
+# Env var for GROQ API
+ARG GROQ_API_KEY
+ENV GROQ_API_KEY=${GROQ_API_KEY}
+
 RUN python data_ingestion_pipeline.py
 RUN python model_training_pipeline.py
 RUN python model_evaluation_pipeline.py
@@ -47,9 +51,6 @@ RUN python rag_pipeline.py
 
 # Default port used by the API (matches config/params.yaml)
 EXPOSE 8000
-
-# Keep GROQ_API_KEY unset by default. Users should set it when running the container
-ENV GROQ_API_KEY=""
 
 # Run the API using uvicorn. We import the app module from the package root (src)
 CMD ["uvicorn", "api.app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
