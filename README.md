@@ -30,7 +30,7 @@ This is a production-grade MLOps Pipeline showcasing:
 
 ## Running into local machine
 
-### 1. Setup Development Environment
+### Setup Development Environment
 
 **Using uv (recommended):**
 
