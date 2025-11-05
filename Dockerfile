@@ -1,4 +1,3 @@
-
 FROM python:3.12-slim
 
 # Prevent Python from writing .pyc files and buffer stdout/stderr
@@ -39,6 +38,12 @@ USER appuser
 
 # The application package root is under /app/src so make that the working dir
 WORKDIR /app/src
+
+RUN python data_ingestion_pipeline.py
+RUN python model_training_pipeline.py
+RUN python model_evaluation_pipeline.py
+RUN python model_inference_pipeline.py
+RUN python rag_pipeline.py
 
 # Default port used by the API (matches config/params.yaml)
 EXPOSE 8000

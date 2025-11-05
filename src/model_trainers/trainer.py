@@ -306,13 +306,13 @@ class ModelTuner:
                     # Infer and log model signature
                     signature = infer_signature(X_train, train_preds)
 
-                    # Log model to MLflow with signature
-                    log_model(
-                        best_estimator,
-                        name="model",
-                        signature=signature,
-                        registered_model_name=None,  # Register separately if best
-                    )
+                    # # Log model to MLflow with signature
+                    # log_model(
+                    #     best_estimator,
+                    #     name="model",
+                    #     signature=signature,
+                    #     registered_model_name=None,  # Register separately if best
+                    # )
 
                     # Store results
                     val_rmse = val_metrics["val_rmse"]
