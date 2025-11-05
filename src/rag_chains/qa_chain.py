@@ -6,16 +6,19 @@ from langchain_core.prompts import PromptTemplate
 
 
 class QAChain:
-    def __init__(self, model_name: str, vector_store: Any):
+    def __init__(self, model_name: str, vector_store: Any, max_docs: int = 2):
         model = self._build_llm(model_name)
 
-        # Custom prompt ensures LLM does not hallucinate
+        # Limit retrieved documents to avoid token overflow
+        retriever = vector_store.as_retriever(search_kwargs={"k": max_docs})
+
+        # Shorter prompt to reduce tokens
         prompt = PromptTemplate(
             template=(
-                "You are a helpful assistant for answering questions using ONLY the provided context.\n"
-                'If the answer is not contained in the context, respond strictly with: "I don\'t know".\n\n'
+                "Answer the question using ONLY the context below.\n"
+                'If the answer is not in the context, respond: "I don\'t know".\n\n'
                 "Context:\n{context}\n\n"
-                "Question:\n{question}\n\n"
+                "Question: {question}\n"
                 "Answer:"
             ),
             input_variables=["context", "question"],
@@ -23,7 +26,7 @@ class QAChain:
 
         self.qa_chain = RetrievalQA.from_chain_type(
             llm=model,
-            retriever=vector_store.as_retriever(),
+            retriever=retriever,
             return_source_documents=True,
             chain_type_kwargs={"prompt": prompt},
         )
@@ -32,25 +35,17 @@ class QAChain:
         self.logger.info("QAChain initialized with model: %s", model_name)
 
     def answer_question(self, question: str) -> Dict[str, Any]:
-        """Answer a question using the RetrievalQA chain.
-
-        Returns a dict with keys:
-        - 'result': Final answer with IDK logic applied
-        - 'source_documents': Retrieved docs
-        """
         self.logger.info("Invoking chain for question: %s", question)
-        response = self.qa_chain.invoke({"query": question})
 
+        response = self.qa_chain.invoke({"query": question})
         source_docs = response.get("source_documents", [])
         raw_answer = response.get("result", "").strip()
 
-        # Case 1: No documents retrieved
         if not source_docs:
             self.logger.info("No source documents found. Responding with IDK.")
             response["result"] = "I don't know"
             return response
 
-        # Case 2: LLM was unsure or prompt forced IDK
         lowered = raw_answer.lower()
         if lowered in {"i don't know", "i dont know", "don't know", "idk"}:
             self.logger.info("LLM returned uncertainty response.")
