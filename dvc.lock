@@ -332,6 +332,6 @@ stages:
     outs:
     - path: chroma_db
       hash: md5
-      md5: 72040b05024ba71855e9e2399eadb117.dir
-      size: 39989308
+      md5: 6e368fe384441d4807726c0056523fea.dir
+      size: 39972924
       nfiles: 6
