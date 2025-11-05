@@ -6,6 +6,7 @@ It also provides a QnA API Endpoint where user can ask about the product on Amaz
 ## 🎯 Project Overview
 
 This is a production-grade MLOps Pipeline showcasing:
+
 - **Data Ingestion Pipeline**: Automated data loading, validation, preprocessing, and feature engineering
 - **Data Versioning**: Using DVC for reproducible data management
 - **Quality Monitoring**: Automated data quality metrics and validation
@@ -29,12 +30,10 @@ This is a production-grade MLOps Pipeline showcasing:
 
 ## Running into local machine
 
-
-## 🚀 Quick Start
-
 ### 1. Setup Development Environment
 
 **Using uv (recommended):**
+
 ```powershell
 # Create virtual environment
 uv venv
@@ -47,6 +46,64 @@ uv pip install -r requirements.txt
 ```
 
 **Using pip:**
+
+```powershell
+# Create virtual environment
+python -m venv .venv
+
+# Activate the virtual environment
+.\.venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Run Python scripts to setup
+
+1. `cd src`
+1. Run: `python data_ingestion_pipeline.py`
+1. Run: `python model_training_pipeline.py`
+1. Run: `python model_evaluation_pipeline.py`
+1. Run: `python model_inference_pipeline.py`
+1. Run: `python rag_pipeline.py`
+1. Run: `python run_api.py`
+1. Browse to [localhost:8000](http://localhost:8000/docs) for API documentation.
+
+## Usage
+
+### Predict Discount
+
+1. Browse to [localhost:8000](http://localhost:8000/docs) for API documentation.
+1. ![Predict Discount Endpoint](predict_discount_1.png)
+1. ![Predict Discount Execute](predict_discount_2.png)
+1. ![Predict Discount Result](predict_discount_3.png)
+
+### Answer Question (RAG Endpoint)
+
+1. Browse to [localhost:8000](http://localhost:8000/docs) for API documentation.
+1. ![Answer Question Endpoint](answer_question_1.png)
+1. ![Answer Question Execute](answer_question_2.png)
+1. ![Answer Question Result](answer_question_3.png)
+
+## 🚀 Quick Start
+
+### 1. Setup Development Environment
+
+**Using uv (recommended):**
+
+```powershell
+# Create virtual environment
+uv venv
+
+# Activate the virtual environment
+.\.venv\Scripts\activate
+
+# Install dependencies
+uv pip install -r requirements.txt
+```
+
+**Using pip:**
+
 ```powershell
 # Create virtual environment
 python -m venv .venv
@@ -79,6 +136,7 @@ git commit -m "Add raw data tracking with DVC"
 ### 4. Setup Remote Storage (Optional but Recommended)
 
 **Local Remote (for development):**
+
 ```powershell
 python -m dvc remote add -d localremote ./dvc_storage
 python -m dvc push
@@ -119,6 +177,7 @@ python -m dvc repro model_inference
 After running the pipeline, the following artifacts will be generated:
 
 ### Processed Data
+
 - `data/processed/selected.csv` - Selected columns from raw data
 - `data/processed/X_train.csv` - Training features
 - `data/processed/y_train.csv` - Training target
@@ -126,14 +185,16 @@ After running the pipeline, the following artifacts will be generated:
 - `data/processed/y_test.csv` - Test raw target
 
 ### Artifacts
+
 - `artifacts/preprocessor.joblib` - Fitted preprocessing pipeline (scalers, encoders)
 - `artifacts/data_quality_metrics.json` - Comprehensive data quality metrics
- - `artifacts/experiments.csv` - Training experiment records (hyperparams, scores)
- - `artifacts/model.joblib` - Trained model artifact
- - `artifacts/eval_metrics.json` - Evaluation metrics for the final model
- - `artifacts/predictions.csv` - Inference output (predictions on test set)
+- `artifacts/experiments.csv` - Training experiment records (hyperparams, scores)
+- `artifacts/model.joblib` - Trained model artifact
+- `artifacts/eval_metrics.json` - Evaluation metrics for the final model
+- `artifacts/predictions.csv` - Inference output (predictions on test set)
 
 ### Logs
+
 - `logs/data_ingestion.log` - Data Ingestion logs
 - `logs/model_training.log` - Model Training logs
 - `logs/model_evaluation.log` - Model Evaluation logs
@@ -146,7 +207,6 @@ After running the pipeline, the following artifacts will be generated:
 ```powershell
 type artifacts\data_quality_metrics.json
 ```
-
 
 ## 🧪 Testing
 
@@ -251,10 +311,9 @@ print(resp.json())
 ```
 
 Notes:
+
 - The `/docs` UI is the easiest place to experiment with the JSON schema expected by `/predict_discount`.
 - If the model or preprocessor artifacts are missing (e.g., `artifacts/model.joblib`), the API will start but the `/predict_discount` endpoint may return a 503 until you run the pipeline to produce artifacts.
-
-
 
 ## 📁 Project Structure
 
@@ -366,6 +425,7 @@ Modify this file to adjust pipeline behavior without changing code.
 ## 🆘 Troubleshooting
 
 ### Issue: DVC not initialized
+
 ```powershell
 # Solution: initialize DVC and disable analytics
 python -m dvc init
@@ -373,18 +433,21 @@ python -m dvc config core.analytics false
 ```
 
 ### Issue: Missing dependencies
+
 ```powershell
 # Solution:
 pip install -r requirements.txt
 ```
 
 ### Issue: Data file not found
+
 ```powershell
 # Solution: Pull data from DVC remote
 python -m dvc pull
 ```
 
 ### Issue: Pipeline fails with validation error
+
 ```powershell
 # Solution: Reproduce the pipeline (this will run validation stages)
 python -m dvc repro
